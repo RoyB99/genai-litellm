@@ -1,12 +1,23 @@
 # GenAI LiteLLM Configuration
 
-This repository contains LiteLLM proxy configuration for routing AI model requests through Azure API Management (APIM).
+This repository contains LiteLLM proxy configuration for routing AI model requests through Azure API Management (APIM). It includes support for **Claude Code** and other AI coding tools.
 
-## Prerequisites
+## Quick Start
 
-- Docker (recommended) OR Python 3.8+ with LiteLLM installed
+### 1. Install LiteLLM Docker
 
-## Running with Docker (Recommended)
+```bash
+docker pull ghcr.io/berriai/litellm:main-latest
+```
+
+### 2. Setup Environment
+
+```bash
+cp .env.example .env
+# Edit .env and add your Azure APIM subscription key
+```
+
+### 3. Run LiteLLM
 
 ```bash
 docker run -d \
@@ -18,17 +29,41 @@ docker run -d \
   --config /app/config/config.yaml
 ```
 
-### Docker Options
+### 4. Run Claude Code
 
 ```bash
-# Run on a different port
-docker run -d \
-  --name litellm \
-  -p 8000:4000 \
-  -v $(pwd)/config:/app/config \
-  --env-file .env \
-  ghcr.io/berriai/litellm:main-latest \
-  --config /app/config/config.yaml
+export ANTHROPIC_BASE_URL=http://localhost:4000
+export ANTHROPIC_API_KEY=dummy-key
+claude
+```
+
+---
+
+## Prerequisites
+
+- Docker
+- Azure APIM subscription key
+
+## Configuration
+
+1. Copy the example environment file and add your API key:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit `.env` and set your APIM subscription key:
+   ```
+   AZURE_OPENAI_API_KEY=your-actual-subscription-key
+   ```
+
+## Docker Commands
+
+```bash
+# View logs
+docker logs -f litellm
+
+# Restart (after config changes)
+docker restart litellm
 
 # Run with debug logging
 docker run -d \
@@ -39,12 +74,25 @@ docker run -d \
   ghcr.io/berriai/litellm:main-latest \
   --config /app/config/config.yaml --detailed_debug
 
-# View logs
-docker logs -f litellm
-
 # Stop and remove
 docker stop litellm && docker rm litellm
 ```
+
+## Using with Claude Code
+
+Once LiteLLM is running, set the environment variables and run Claude:
+
+```bash
+export ANTHROPIC_BASE_URL=http://localhost:4000
+export ANTHROPIC_API_KEY=dummy-key
+claude
+```
+
+The proxy translates Claude API requests to Azure OpenAI, allowing Claude Code to work with your Azure backend.
+
+### How It Works
+
+Claude Code sends requests using Anthropic's API format with parameters like `context_management`. The custom callback in `config/custom_callbacks.py` strips these Anthropic-specific parameters before forwarding to Azure OpenAI, which doesn't support them.
 
 ## Running with pip (Alternative)
 
@@ -56,42 +104,13 @@ pip install litellm
 
 ### Start the Proxy
 
-## Configuration
-
-1. Copy the example environment file and add your API key:
-   ```bash
-   cp .env.example .env
-   ```
-
-2. Edit `.env` and set your APIM subscription key:
-   ```
-   AZURE_APIM_API_KEY=your-actual-subscription-key
-   ```
-
-### Start the Proxy
-
 ```bash
 litellm --config config/config.yaml
 ```
 
 The proxy will start on `http://localhost:4000` by default.
 
-### pip Additional Options
-
-```bash
-# Run on a specific port
-litellm --config config/config.yaml --port 8000
-
-# Run with debug logging
-litellm --config config/config.yaml --debug
-
-# Run in detailed debug mode
-litellm --config config/config.yaml --detailed_debug
-```
-
-## Usage
-
-Once running, send requests to the proxy using the model names defined in the config:
+## Testing
 
 ```bash
 curl http://localhost:4000/v1/chat/completions \
@@ -102,15 +121,24 @@ curl http://localhost:4000/v1/chat/completions \
   }'
 ```
 
+## Model Mappings
+
+| Request Model Name | Backend Deployment |
+|-------------------|-------------------|
+| claude-sonnet-4-5 | Azure GPT model |
+| claude-sonnet-4-5-20250929 | Azure GPT model |
+| claude-haiku-4-5 | Azure GPT mini model |
 
 ## Environment Variables
 
 | Variable | Description |
 |----------|-------------|
-| `AZURE_APIM_API_KEY` | Your Azure APIM subscription key |
-## Model Mappings
+| `AZURE_OPENAI_API_KEY` | Your Azure APIM subscription key |
 
-| Request Model Name | Backend Deployment |
-|-------------------|-------------------|
-| claude-sonnet-4-5 | azure/gpt-4.1-2025-04-14 |
-| claude-haiku-4-5 | azure/gpt-4.1-mini-2025-04-14 |
+## Files
+
+| File | Description |
+|------|-------------|
+| `config/config.yaml` | LiteLLM configuration with model mappings |
+| `config/custom_callbacks.py` | Custom callback to drop Anthropic-specific parameters |
+| `.env` | Environment variables (API keys) |

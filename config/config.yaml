@@ -1,3 +1,13 @@
+litellm_settings:
+  drop_params: true
+  request_timeout: 600
+  modify_params: true
+  enable_json_schema_validation: false
+  callbacks: custom_callbacks.drop_handler
+  
+general_settings:
+  drop_params: true
+
 model_list:
   # Map Claude model names to your APIM deployments
   - model_name: claude-sonnet-4-5
@@ -6,6 +16,15 @@ model_list:
       api_base: https://staging-openai.azure-api.net/openai-gw-proxy-dev
       api_key: os.environ/AZURE_OPENAI_API_KEY
       api_version: "2025-04-01-preview"
+      drop_params: true
+
+  - model_name: claude-sonnet-4-5-20250929
+    litellm_params:
+      model: azure/gpt-5.2-2025-12-11
+      api_base: https://staging-openai.azure-api.net/openai-gw-proxy-dev
+      api_key: os.environ/AZURE_OPENAI_API_KEY
+      api_version: "2025-04-01-preview"
+      drop_params: true
 
   - model_name: claude-haiku-4-5
     litellm_params:
@@ -13,3 +32,4 @@ model_list:
       api_base: https://staging-openai.azure-api.net/openai-gw-proxy-dev
       api_key: os.environ/AZURE_OPENAI_API_KEY
       api_version: "2025-04-01-preview"
+      drop_params: true
