@@ -7,14 +7,16 @@ __pycache__/
 *$py.class
 .Python
 venv/
+temp_auto_push.bat
 .venv/
 
 # IDE
 .idea/
-.vscode/
 *.swp
 *.swo
 
 # OS
 .DS_Store
 Thumbs.db
+.gitignore
+temp_interactive_push.bat
