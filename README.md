@@ -37,6 +37,27 @@ export ANTHROPIC_API_KEY=dummy-key
 claude
 ```
 
+### (Optional) Set Environment Variables Permanently
+
+#### macOS / Linux
+
+Add to your `~/.zshrc` or `~/.bashrc`:
+
+```bash
+echo 'export ANTHROPIC_BASE_URL=http://localhost:4000' >> ~/.zshrc
+echo 'export ANTHROPIC_API_KEY=dummy-key' >> ~/.zshrc
+source ~/.zshrc
+```
+
+#### Windows (PowerShell)
+
+```powershell
+[System.Environment]::SetEnvironmentVariable('ANTHROPIC_BASE_URL', 'http://localhost:4000', 'User')
+[System.Environment]::SetEnvironmentVariable('ANTHROPIC_API_KEY', 'dummy-key', 'User')
+```
+
+Then restart your terminal.
+
 ---
 
 ## Prerequisites
