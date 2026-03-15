@@ -9,7 +9,6 @@ general_settings:
   drop_params: true
 
 model_list:
-  # Map Claude model names to your APIM deployments
   - model_name: claude-sonnet-4-5-20250929
     litellm_params:
       model: azure/gpt-5.2-2025-12-11
